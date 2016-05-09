@@ -36,11 +36,8 @@ controller.hears('.*', ['mention'], function (bot, message) {
 });
 
 controller.hears('help', ['direct_message', 'direct_mention'], function (bot, message) {
-  var help = 'I will respond to the following messages: \n' +
-      '`bot hi` for a simple message.\n' +
-      '`bot attachment` to see a Slack attachment message.\n' +
-      '`@<your bot\'s name>` to demonstrate detecting a mention.\n' +
-      '`bot help` to see this again.';
+  var help = 'OK!  You can mention me from any chat room around readytalk! Simply say \n' +
+    "@foxbot invite <amigo1> <amigo2> ... to <room name>";
   bot.reply(message, help);
 });
 

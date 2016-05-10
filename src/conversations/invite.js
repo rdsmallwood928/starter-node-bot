@@ -24,7 +24,10 @@ var handleConversation = function(invitation, convo) {
   switch(invitation.verify()) {
     case "users":
       convo.ask("Who would you like to invite? Just type @<their name>.", function(response, convo) {
-        invitation.addUser(response.text.substring(2, response.text.length-1));
+        var users = response.text.split(" ");
+        for(var user of users) {
+          invitation.addUser(user.substring(2, user.length-1));
+        }
         handleConversation(invitation, convo);
       });
       convo.next();

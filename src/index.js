@@ -22,7 +22,7 @@ controller.hears('.*', ['mention'], function (bot, message) {
 });
 
 controller.hears('help', ['direct_message', 'direct_mention'], function (bot, message) {
-  var help = 'OK!  You can mention me from any chat room around readytalk! Simply say \n' +
+  var help = "Just mention me or dm the word invite or start, or if you're in a rush just say " +
     "@foxbot invite <@amigo1> <@amigo2> ... to <room name>";
   bot.reply(message, help);
 });
@@ -47,6 +47,7 @@ controller.hears(['attachment'], ['direct_message', 'direct_mention'], function 
 });
 
 controller.hears('invite', ['direct_message', 'direct_mention'], inviteConvo.startInviteConvo);
+controller.hears('start', ['direct_message', 'direct_mention'], inviteConvo.startInviteConvo);
 
 controller.hears('.*', ['direct_message', 'direct_mention'], function (bot, message) {
   bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand. \n');

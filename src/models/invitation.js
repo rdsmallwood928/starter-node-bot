@@ -27,7 +27,7 @@ Invitation.prototype.addUser = function(user) {
 
 Invitation.prototype.setRoom = function(room) {
   if(room.indexOf("mailto") > -1) {
-    var tempRoom = room.split["|"][1];
+    var tempRoom = room.split("|")[1];
     room = tempRoom.substring(0, tempRoom.length-1);
   }
   this._room = room;

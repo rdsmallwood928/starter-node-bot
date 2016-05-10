@@ -1,22 +1,8 @@
-var Botkit = require('botkit');
+"use strict";
 
-// Expect a SLACK_TOKEN environment variable
-var slackToken = process.env.SLACK_TOKEN;
-if (!slackToken) {
-  console.error('SLACK_TOKEN is required!');
-  process.exit(1);
-}
-
-var controller = Botkit.slackbot();
-var bot = controller.spawn({
-  token: slackToken
-});
-
-bot.startRTM(function (err, bot, payload) {
-  if (err) {
-    throw new Error('Could not connect to Slack');
-  }
-});
+var inviteConvo = require("./conversations/invite");
+var botService = require("./service/botService");
+var controller = botService.getController();
 
 controller.on('bot_channel_join', function (bot, message) {
   bot.reply(message, "I'm here!");
@@ -60,40 +46,7 @@ controller.hears(['attachment'], ['direct_message', 'direct_mention'], function 
   });
 });
 
-controller.hears('invite', ['direct_message', 'direct_mention'], function(bot, message) {
-  console.log("MESSAGE: " + JSON.stringify(message));
-  bot.reply(message, "Ok coming right up!");
-  var users = message.text.split(" ");
-  var foundTo = false;
-  var usersToDm = [];
-  var room;
-  for(var user of users) {
-    if(user[0] === "<" && !foundTo) {
-      usersToDm.push(user.substring(2, user.length-1));
-    }
-    if(foundTo) {
-      room = user.split("|")[1];
-      room = room.substring(0, room.length-1);
-    }
-    if(user === "to" ) {
-      foundTo = true;
-    }
-  }
-  for(var dm of usersToDm) {
-    inviteToMeeting(dm, room, bot, message);
-  }
-});
-
-var inviteToMeeting = function(user, room, bot, message) {
-  var directMessage = JSON.parse(JSON.stringify(message));
-  directMessage.user = user;
-  var invite = "Click this link to join https://my.foxden.io/#/join/" + room;
-  console.log("INVITE: " + invite);
-  bot.startPrivateConversation(directMessage, function(err, dm) {
-    dm.say('Hi! You have been invited to foxden meeting with: <@' + message.user + ">");
-    dm.say(invite);
-  });
-};
+controller.hears('invite', ['direct_message', 'direct_mention'], inviteConvo.startInviteConvo);
 
 controller.hears('.*', ['direct_message', 'direct_mention'], function (bot, message) {
   bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand. \n');

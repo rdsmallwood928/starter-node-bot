@@ -2,29 +2,17 @@
 
 var inviteConvo = require("./conversations/invite");
 var botService = require("./service/botService");
+var scheduleConvo = require("./conversations/schedule");
+var help = require("./conversations/help");
+var utteranceService = require("./service/utteranceService");
 var controller = botService.getController();
 
 controller.on('bot_channel_join', function (bot, message) {
   bot.reply(message, "I'm here!");
 });
 
-controller.hears(['hello', 'hi'], ['direct_mention'], function (bot, message) {
-  bot.reply(message, 'Hello.');
-});
-
-controller.hears(['hello', 'hi'], ['direct_message'], function (bot, message) {
-  bot.reply(message, 'Hello.');
-  bot.reply(message, 'It\'s nice to talk to you directly.');
-});
-
 controller.hears('.*', ['mention'], function (bot, message) {
   bot.reply(message, 'You really do care about me. :heart:');
-});
-
-controller.hears('help', ['direct_message', 'direct_mention'], function (bot, message) {
-  var help = "Just mention me or dm the word invite or start, or if you're in a rush just say " +
-    "@foxbot invite <@amigo1> <@amigo2> ... to <room name>";
-  bot.reply(message, help);
 });
 
 controller.hears(['attachment'], ['direct_message', 'direct_mention'], function (bot, message) {
@@ -46,9 +34,7 @@ controller.hears(['attachment'], ['direct_message', 'direct_mention'], function 
   });
 });
 
-controller.hears('invite', ['direct_message', 'direct_mention'], inviteConvo.startInviteConvo);
-controller.hears('start', ['direct_message', 'direct_mention'], inviteConvo.startInviteConvo);
-
-controller.hears('.*', ['direct_message', 'direct_mention'], function (bot, message) {
-  bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand. \n');
-});
+controller.hears(utteranceService.getInvites(), ['direct_message', 'direct_mention'], inviteConvo.startInviteConvo);
+controller.hears(utteranceService.getSchedules(), ['direct_message', 'direct_mention'], scheduleConvo.startScheduleConversation);
+controller.hears(utteranceService.getGreetings(), ['direct_message', 'direct_mention'], help.sendHelp);
+controller.hears('.*', ['direct_message', 'direct_mention'], help.foxbotConfused);

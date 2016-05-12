@@ -1,6 +1,8 @@
 "use strict";
 
 var Invitation = require("../models/invitation");
+var Utils = require("../utils/utils");
+var log = require("winston");
 
 var parseInitialInviteMessage = function(message, invitation) {
   var users = message.text.split(" ");
@@ -20,13 +22,13 @@ var parseInitialInviteMessage = function(message, invitation) {
   }
 };
 
-var handleConversation = function(invitation, convo) {
+var handleConversation = function(invitation, convo, bot) {
   switch(invitation.verify()) {
     case "users":
       convo.ask("Who would you like to invite? Just type @<their name>.", function(response, convo) {
         var users = response.text.split(" ");
         for(var user of users) {
-          invitation.addUser(user.substring(2, user.length-1));
+          invitation.addUser(Utils.parseUser(user));
         }
         handleConversation(invitation, convo);
       });
@@ -40,7 +42,7 @@ var handleConversation = function(invitation, convo) {
       convo.next();
       break;
     case "looksgood":
-      convo.say("OK, everything looks good.  Im going to invite " + invitation.getParticipantNames() + " to " + invitation.room);
+      bot.reply(invitation.getMessage(), "OK, everything looks good.  Im going to invite " + invitation.getParticipantNames() + " to " + invitation.room);
       invitation.send();
       convo.next();
       convo.stop();
@@ -49,11 +51,12 @@ var handleConversation = function(invitation, convo) {
 };
 
 var startInviteConvo = function (bot, message) {
+  log.info("Invite being created by " + message.user);
   var invitation = new Invitation(bot, message);
   parseInitialInviteMessage(message, invitation);
   bot.startConversation(message, function(err,convo) {
     convo.say("Ok, let me make sure this looks good...");
-    handleConversation(invitation, convo);
+    handleConversation(invitation, convo, bot);
   });
 };
 

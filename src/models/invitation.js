@@ -19,17 +19,31 @@ function Invitation(bot, message) {
   this._message = message;
   this._users = [];
   this._room = null;
+  this._time = null;
+  this._host = null;
 }
+
+Invitation.prototype.setTime = function(time) {
+  this._time = time;
+};
+
+Invitation.prototype.getTime = function() {
+  return this._time;
+};
+
+Invitation.prototype.setHost = function(host) {
+  this._host = host;
+};
+
+Invitation.prototype.getHost = function(host) {
+  return this._host;
+};
 
 Invitation.prototype.addUser = function(user) {
   this._users.push(user);
 };
 
 Invitation.prototype.setRoom = function(room) {
-  if(room.indexOf("mailto") > -1) {
-    var tempRoom = room.split("|")[1];
-    room = tempRoom.substring(0, tempRoom.length-1);
-  }
   this._room = room;
 };
 
@@ -41,10 +55,22 @@ Invitation.prototype.send = function () {
 
 Invitation.prototype.getParticipantNames = function () {
   var allUsers = "";
-  for(var user in this._users) {
+  for(var user of this._users) {
     allUsers = allUsers + "<@" + user + ">, ";
   }
   return allUsers.substring(0, allUsers.length-2);
+};
+
+Invitation.prototype.getRoomName = function () {
+  return this._room;
+};
+
+Invitation.prototype.getDateAsString = function() {
+  return this._time.getHours() + ":" + this._time.getMinutes();
+};
+
+Invitation.prototype.getMessage = function () {
+  return this._message;
 };
 
 Invitation.prototype.verify = function() {

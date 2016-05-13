@@ -3,7 +3,7 @@
 var inviteToMeeting = function(user, room, bot, message) {
   var directMessage = JSON.parse(JSON.stringify(message));
   directMessage.user = user;
-  var invite = "Click this link to join https://my.foxden.io/#/join/" + room;
+  var invite = "Click this link to join https://my.foxden.io/#/meet/" + room;
   bot.startPrivateConversation(directMessage, function(err, dm) {
     if(err) {
       console.log(JSON.stringify(err, null, 2));

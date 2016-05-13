@@ -30,19 +30,19 @@ var handleConversation = function(invitation, convo, bot) {
         for(var user of users) {
           invitation.addUser(Utils.parseUser(user));
         }
-        handleConversation(invitation, convo);
+        handleConversation(invitation, convo, bot);
       });
       convo.next();
       break;
     case "room":
       convo.ask("What room do you want to meet in?", function(response, convo) {
-        invitation.setRoom(response.text);
-        handleConversation(invitation, convo);
+        invitation.setRoom(Utils.parseRoom(response.text));
+        handleConversation(invitation, convo, bot);
       });
       convo.next();
       break;
     case "looksgood":
-      bot.reply(invitation.getMessage(), "OK, everything looks good.  Im going to invite " + invitation.getParticipantNames() + " to " + invitation.room);
+      bot.reply(invitation.getMessage(), "OK, everything looks good.  Im going to invite " + invitation.getParticipantNames() + " to " + invitation.getRoomName());
       invitation.send();
       convo.next();
       convo.stop();

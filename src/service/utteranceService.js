@@ -14,6 +14,11 @@ var getGreetings = function() {
   return capitializeUtterances(greetings);
 };
 
+var foxSay = function() {
+  var foxSay = ['what does the fox say'];
+  return capitializeUtterances(foxSay);
+};
+
 var getSchedules = function() {
   var schedules = ['schedule'];
   return capitializeUtterances(schedules);
@@ -27,5 +32,6 @@ function getInvites() {
 module.exports = {
   getGreetings: getGreetings,
   getSchedules: getSchedules,
-  getInvites: getInvites
+  getInvites: getInvites,
+  getFoxSay: foxSay
 };

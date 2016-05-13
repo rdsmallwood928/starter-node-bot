@@ -34,6 +34,7 @@ controller.hears(['attachment'], ['direct_message', 'direct_mention'], function 
   });
 });
 
+controller.hears(utteranceService.getFoxSay(), ['direct_message', 'direct_mention'], help.foxSay);
 controller.hears(utteranceService.getInvites(), ['direct_message', 'direct_mention'], inviteConvo.startInviteConvo);
 controller.hears(utteranceService.getSchedules(), ['direct_message', 'direct_mention'], scheduleConvo.startScheduleConversation);
 controller.hears(utteranceService.getGreetings(), ['direct_message', 'direct_mention'], help.sendHelp);

@@ -3,63 +3,52 @@
 var Invitation = require("../models/invitation");
 var Utils = require("../utils/utils");
 var log = require("winston");
+var AskParticipants = require("../questions/participants");
+var AskRoom = require("../questions/room");
+var Conversation = require("../conversations/converations");
 
-var parseInitialInviteMessage = function(message, invitation) {
-  var users = message.text.split(" ");
-  var foundTo = false;
-  var room;
-  for(var user of users) {
-    if(user[0] === "<" && !foundTo) {
-      invitation.addUser(user.substring(2, user.length-1));
+var sendInvites = function() {
+  this._convo.say("Cool beans, I've got " + this._opts.invitation.getParticipantNames() + " attending your meeting in " +
+    this._opts.invitation.getRoomName());
+  var _this = this;
+  this._convo.ask("Sound good?", [
+    {
+      pattern: _this._bot.utterances.yes,
+      callback: function(response, convo) {
+        _this._bot.reply(_this._message,"Invites away, get your game face on.");
+        _this.getOpts().invitation.send();
+        convo.next();
+        convo.stop();
+      }
+    },
+    {
+      pattern: _this._bot.utterances.no,
+      callback: function(response, convo) {
+        _this._bot.reply(_this._message,"You were too cool for that meeting anyway.");
+        convo.next();
+        convo.stop();
+      }
     }
-    if(foundTo) {
-      room = user.split("|")[1];
-      invitation.setRoom(room);
-    }
-    if(user === "to" ) {
-      foundTo = true;
-    }
-  }
-};
-
-var handleConversation = function(invitation, convo, bot) {
-  switch(invitation.verify()) {
-    case "users":
-      convo.ask("Who would you like to invite? Just type @<their name>.", function(response, convo) {
-        var users = response.text.split(" ");
-        for(var user of users) {
-          invitation.addUser(Utils.parseUser(user));
-        }
-        handleConversation(invitation, convo, bot);
-      });
-      convo.next();
-      break;
-    case "room":
-      convo.ask("What room do you want to meet in?", function(response, convo) {
-        invitation.setRoom(Utils.parseRoom(response.text));
-        handleConversation(invitation, convo, bot);
-      });
-      convo.next();
-      break;
-    case "looksgood":
-      bot.reply(invitation.getMessage(), "OK, everything looks good.  Im going to invite " + invitation.getParticipantNames() + " to " + invitation.getRoomName());
-      invitation.send();
-      convo.next();
-      convo.stop();
-      break;
-  }
+  ]);
 };
 
 var startInviteConvo = function (bot, message) {
-  log.info("Invite being created by " + message.user);
+  log.info("Invite be created by " + message.user);
   var invitation = new Invitation(bot, message);
-  parseInitialInviteMessage(message, invitation);
-  bot.startConversation(message, function(err,convo) {
-    convo.say("Ok, let me make sure this looks good...");
-    handleConversation(invitation, convo, bot);
-  });
+  invitation.setHost(message.user);
+  var opts = {
+    invitation: invitation
+  };
+  var conversation = new Conversation(
+    bot,
+    message,
+    opts
+  );
+  conversation.addQuestion(new AskRoom(conversation));
+  conversation.addQuestion(new AskParticipants(conversation));
+  conversation.setEndCallback(sendInvites);
+  conversation.startConversation();
 };
-
 
 module.exports = {
   startInviteConvo: startInviteConvo

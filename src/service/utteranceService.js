@@ -20,7 +20,7 @@ var foxSay = function() {
 };
 
 var getSchedules = function() {
-  var schedules = ['schedule'];
+  var schedules = ['schedule', 'sched'];
   return capitializeUtterances(schedules);
 };
 

@@ -21,6 +21,7 @@ var foxPhrases = [
   "Fox you",
   "Hey foxy lady!",
   "Why are you asking a foxbot?",
+  "Part fox, part bot, but ALL cool",
   "Google it"
 ];
 
